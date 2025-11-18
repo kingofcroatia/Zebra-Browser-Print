@@ -1,227 +1,161 @@
-# Odoo RFID Modules
+# Zebra Browser Print Integration for Odoo
 
-Professional RFID label generation and printing solution for Odoo 18.0.
+Automatically print ZPL labels directly to Zebra printers without file downloads.
 
-Automates SGTIN-96 EPC code generation and direct printing to Zebra RFID printers via Browser Print, eliminating manual file downloads and improving warehouse efficiency.
-
-![License](https://img.shields.io/badge/license-LGPL--3-blue)
 ![Odoo](https://img.shields.io/badge/odoo-18.0-purple)
-![Python](https://img.shields.io/badge/python-3.11+-green)
+![License](https://img.shields.io/badge/license-LGPL--3-blue)
 
 ---
 
-## 🎯 Features
+## 🎯 Overview
 
-### RFID EPC Auto Generation
-- ✅ Automatic SGTIN-96 EPC code generation (GS1 standard)
-- ✅ Sequential serial numbers per product (production tracking)
-- ✅ Auto-generates barcodes if missing
-- ✅ Thread-safe counters (multi-user support)
-- ✅ ZPL label templates with RFID encoding commands
-- ✅ Compatible with Zebra ZT231R, ZT411R, and other RFID printers
+This module intercepts Odoo ZPL report downloads and sends them directly to local Zebra printers via Zebra Browser Print service. Works seamlessly with cloud-hosted Odoo installations.
 
-### Zebra Browser Print Integration
-- ✅ Direct printing to local/network Zebra printers
-- ✅ No file downloads required
-- ✅ Automatic printer detection (USB, Network, Bluetooth)
-- ✅ Works with cloud-hosted Odoo
-- ✅ ZPL format validation
-- ✅ Seamless integration with Odoo reports
+**No more manual file downloads!** Labels print automatically when you click "Print" in Odoo.
 
 ---
 
-## 📦 Modules
+## ✨ Features
 
-### 1. RFID EPC Auto Generation (`rfid_epc_auto`)
+- ✅ **Automatic ZPL Detection** - Recognizes ZPL format reports
+- ✅ **Direct Printing** - No file downloads required
+- ✅ **Multi-Connection Support** - USB, Network, and Bluetooth printers
+- ✅ **Cloud Compatible** - Works with cloud-hosted Odoo
+- ✅ **Smart Fallback** - Downloads file if Browser Print unavailable
+- ✅ **User Notifications** - Clear success/error messages
+- ✅ **Zero Configuration** - Works out of the box
 
-Generates GS1-compliant SGTIN-96 EPC codes and creates ZPL labels with RFID encoding.
+---
 
-**Key Features:**
-- Automatic EPC generation using product barcode
-- Sequential or random serial numbers
-- RFID chip encoding via ZPL `^RFW` command
-- Integrated with Odoo product labels
-- Supports EAN-13, EAN-14, UPC-A barcodes
+## 📋 Requirements
 
-**Use Cases:**
-- Medical device tracking
-- Inventory management
-- Asset tracking
-- Production counting
-- Recall capability
+### Server Side
+- Odoo 18.0 (Community or Enterprise)
+- ZPL-generating report module (e.g., `rfid_epc_auto`)
 
-### 2. Zebra Browser Print Integration (`zebra_browser_print`)
-
-JavaScript module that intercepts Odoo report downloads and sends ZPL directly to Zebra printers via Browser Print service.
-
-**Key Features:**
-- Automatic ZPL detection
-- Direct printer communication
-- USB/Network/Bluetooth support
-- Error handling with fallback to download
-- User-friendly notifications
+### Client Side
+- **Zebra Browser Print** installed on user's computer
+- Chrome or Edge browser (recommended)
+- Zebra printer (USB, Network, or Bluetooth)
 
 ---
 
 ## 🚀 Installation
 
-### Prerequisites
+### Step 1: Install Zebra Browser Print (Client Computer)
 
-- **Odoo 18.0** (Community or Enterprise)
-- **Python 3.11+**
-- **pyepc library** for EPC encoding
-- **Zebra Browser Print** (on client computers)
-- **Zebra RFID printer** (ZT231R, ZT411R, etc.)
+**Download:**
+https://www.zebra.com/us/en/support-downloads/software/printer-software/zebra-browser-print.html
 
-### Step 1: Install Python Dependencies
-```bash
-# Install pyepc library for EPC generation
-pip install pyepc --break-system-packages
+**Install:**
+1. Download for your OS (Windows/Mac/Linux)
+2. Run installer
+3. Start the service
+4. Verify: Open `http://localhost:9100/available` in browser
+
+**Should show:**
+```json
+{
+  "printer": [{
+    "name": "ZT231R-203dpi",
+    "connection": "usb",
+    "deviceType": "printer"
+  }]
+}
 ```
 
-### Step 2: Install Odoo Modules
+### Step 2: Install Odoo Module
 ```bash
-# Clone repository
+# Copy module to Odoo addons directory
 cd /opt/odoo/odoo/addons/
-git clone https://github.com/yourusername/odoo-rfid-modules.git
-
-# Move modules to addons directory
-mv odoo-rfid-modules/rfid_epc_auto ./
-mv odoo-rfid-modules/zebra_browser_print ./
+git clone https://github.com/yourusername/zebra_browser_print.git
 
 # Set permissions
-sudo chown -R odoo:odoo rfid_epc_auto zebra_browser_print
-sudo chmod -R 755 rfid_epc_auto zebra_browser_print
+sudo chown -R odoo:odoo zebra_browser_print
+sudo chmod -R 755 zebra_browser_print
 
 # Restart Odoo
 sudo systemctl restart odoo
 ```
 
-### Step 3: Install Zebra Browser Print (Client Side)
+### Step 3: Activate in Odoo
 
-**On each computer that prints labels:**
-
-1. Download from [Zebra Support](https://www.zebra.com/us/en/support-downloads/software/printer-software/zebra-browser-print.html)
-2. Install for your OS (Windows/Mac/Linux)
-3. Start the service
-4. Verify: Open `http://localhost:9100/available` in browser
-
-### Step 4: Activate Modules in Odoo
-
-1. **Apps** → **Update Apps List**
-2. Search: **"RFID EPC Auto Generation"**
-3. Click **Install**
-4. Search: **"Zebra Browser Print Integration"**
-5. Click **Install**
-
----
-
-## ⚙️ Configuration
-
-### RFID EPC Auto Generation
-
-**Per Product Settings:**
-
-1. Go to **Inventory → Products → Open any product**
-2. **Inventory tab** → RFID Serial Numbers section:
-   - ✅ **Use Sequential RFID Serials** (default: enabled)
-   - View **Last RFID Serial** (counter)
-
-**Features:**
-- Each product has its own serial counter
-- Counter starts at 1 and increments automatically
-- Barcodes auto-generated if missing (format: `999` + Product ID)
-
-### Zebra Browser Print
-
-**No configuration needed!** Works automatically once installed.
-
-**How it works:**
-1. User clicks "Print → Product Labels" in Odoo
-2. JavaScript detects ZPL format
-3. Sends directly to Zebra Browser Print
-4. Label prints automatically
+1. Go to **Apps** menu
+2. Click **Update Apps List**
+3. Search: **"Zebra Browser Print"**
+4. Click **Install**
+5. Done! No configuration needed.
 
 ---
 
 ## 📖 Usage
 
-### Printing RFID Labels
+### Printing Labels
 
-1. **Go to:** Inventory → Products → Products
-2. **Open** any product
-3. **Click:** Print → Product Labels
-4. **Enter quantity** (e.g., 10)
-5. **Click:** Print
+1. Open any Odoo form with ZPL report (e.g., Product Labels)
+2. Click **Print** → Select ZPL report
+3. Click **Print**
+4. **Label prints automatically!**
 
-**What happens:**
-- ✅ EPC codes generated (one per label)
-- ✅ Serial numbers incremented automatically
-- ✅ ZPL sent to printer via Browser Print
-- ✅ Labels print with encoded RFID chips
-- ❌ No file downloads!
-
-### Checking Serial Numbers
-
-**View last used serial:**
-- Product → Inventory tab → "Last RFID Serial"
-
-**Example:**
+**What happens behind the scenes:**
 ```
-Product: Medical Implant ABC
-Last RFID Serial: 156
-
-Next print will use serials: 157, 158, 159...
+User clicks Print
+    ↓
+JavaScript intercepts download
+    ↓
+Detects ZPL format (^XA...^XZ)
+    ↓
+Checks Browser Print (localhost:9100)
+    ↓
+Gets available printer
+    ↓
+Sends ZPL to printer
+    ↓
+Label prints! ✅
 ```
 
 ---
 
-## 🔧 Technical Details
+## 🔧 How It Works
 
-### SGTIN-96 EPC Structure
+### Architecture
 ```
-Header:          8 bits  (0x30 - SGTIN-96)
-Filter:          3 bits  (1 = Point of Sale)
-Partition:       3 bits  (5 = 7-digit prefix)
-Company Prefix: 24 bits  (7 digits)
-Item Reference: 20 bits  (5 digits)
-Serial Number:  38 bits  (1 to 274,877,906,943)
-```
-
-### ZPL Label Template
-```zpl
-^XA
-^RW28
-^RS8
-^RZ2,1
-^CI28
-^PW609
-^LL200
-
-^FO150,10^BY2.4
-^BCN,80,N,N,N
-^FD1234567890123^FS
-
-^FO25,120
-^A0N,22,18^FDProduct Name^FS
-
-^RFW,H^FD30344B32641D29770000001^FS
-
-^XZ
+Odoo Server                Client Browser               Zebra Printer
+    │                           │                            │
+    │  1. Generate ZPL Report   │                            │
+    │──────────────────────────>│                            │
+    │                           │                            │
+    │                           │  2. Intercept Download     │
+    │                           │     (JavaScript)           │
+    │                           │                            │
+    │                           │  3. Detect ZPL Format      │
+    │                           │     (Check ^XA/^XZ)        │
+    │                           │                            │
+    │                           │  4. Send to Browser Print  │
+    │                           │─────────────────────────>  │
+    │                           │     (localhost:9100)       │
+    │                           │                            │
+    │                           │                      5. Print Label
+    │                           │                            │
 ```
 
-**Key commands:**
-- `^BCN` - Barcode (Code 128)
-- `^RFW` - Write RFID tag
-- `^XA`/`^XZ` - ZPL start/end markers
+### JavaScript Detection Logic
 
-### Browser Print API
+The module detects ZPL reports by checking:
+- URL contains product label indicators
+- Response contains ZPL markers (`^XA`, `^XZ`)
+- Content includes RFID commands (`^RFW`, `^RFR`)
 
-**Endpoints:**
-```javascript
-GET  http://localhost:9100/available  // List printers
-POST http://localhost:9100/write      // Send ZPL
-```
+### Supported Printers
+
+**Tested:**
+- Zebra ZT231R (USB/Network)
+- Zebra ZT411R (USB/Network)
+- Zebra ZT610R (USB/Network)
+
+**Should work with any Zebra printer supporting:**
+- ZPL programming language
+- Zebra Browser Print service
 
 ---
 
@@ -229,102 +163,272 @@ POST http://localhost:9100/write      // Send ZPL
 
 ### Issue: Labels Download Instead of Print
 
+**Symptom:** File downloads when clicking Print
+
 **Cause:** Zebra Browser Print not running
 
 **Solution:**
 ```bash
-# Windows: Check service
-services.msc → Find "Zebra Browser Print Service"
+# Check if Browser Print is running
+# Open in browser: http://localhost:9100/available
 
-# Verify in browser
+# Windows: Check service status
+services.msc → Find "Zebra Browser Print Service" → Start
+
+# Mac: Check Applications
+Applications → Zebra Browser Print → Open
+
+# Verify printer detected
 http://localhost:9100/available
+# Should show your printer in JSON format
 ```
 
 ---
 
 ### Issue: "Not ZPL Format" Warning
 
-**Cause:** RFID EPC Auto module not installed
+**Symptom:** Warning message about ZPL format
+
+**Cause:** Report is not generating ZPL (probably PDF)
 
 **Solution:**
-1. Apps → Search "RFID EPC"
-2. Install "RFID EPC Auto Generation"
-3. Restart Odoo
-4. Try printing again
+1. Ensure you're using a ZPL-generating report
+2. Check if `rfid_epc_auto` or similar module is installed
+3. Verify report template includes `^XA`/`^XZ` markers
 
 ---
 
-### Issue: Java Process Using Port 9100
+### Issue: Port 9100 Already in Use
+
+**Symptom:** Browser Print won't start
 
 **Cause:** Another application using port 9100
 
 **Solution:**
 ```bash
-# Find process
+# Find what's using port 9100
 netstat -ano | findstr :9100
 
-# Kill it (Windows)
+# Windows: Kill the process
 taskkill /F /PID [process_id]
 
-# Start Zebra Browser Print
+# Mac/Linux: Kill the process
+kill -9 [process_id]
+
+# Restart Browser Print
 net start "Zebra Browser Print Service"
 ```
 
 ---
 
+### Issue: Printer Not Detected
+
+**Symptom:** "No printer found" message
+
+**Cause:** Printer not connected or not recognized
+
+**Solution:**
+1. **Check physical connection:**
+   - USB: Ensure cable connected and drivers installed
+   - Network: Verify printer IP is accessible (ping test)
+
+2. **Check Browser Print:**
+```
+   http://localhost:9100/available
+```
+   Should list your printer
+
+3. **Restart printer and Browser Print**
+
+---
+
 ## 🧪 Testing
 
-### Test EPC Generation
-```python
-# Odoo shell
-product = env['product.product'].browse(1)
-epc = product.generate_sgtin96_epc()
-print(f"Generated EPC: {epc}")
-print(f"Serial: {product.last_rfid_serial}")
-```
+### Test Browser Print Service
 
-### Test Browser Print
-
-1. Open browser console (F12)
-2. Run:
+**In browser console (F12):**
 ```javascript
+// Check if service is running
 fetch('http://localhost:9100/available')
   .then(r => r.json())
-  .then(d => console.log('Printers:', d))
+  .then(d => console.log('✅ Printers:', d))
+  .catch(e => console.error('❌ Error:', e));
+```
+
+**Expected output:**
+```javascript
+✅ Printers: {
+  printer: [{
+    name: "ZT231R-203dpi USB",
+    connection: "usb",
+    deviceType: "printer",
+    manufacturer: "Zebra Technologies"
+  }]
+}
+```
+
+### Test ZPL Printing
+
+**Send test ZPL:**
+```javascript
+const testZPL = `
+^XA
+^FO50,50^ADN,36,20^FDTest Label^FS
+^FO50,100^BY2^BCN,100,Y,N,N^FD123456^FS
+^XZ
+`;
+
+fetch('http://localhost:9100/write', {
+  method: 'POST',
+  body: JSON.stringify({
+    device: { name: "ZT231R-203dpi USB" },
+    data: testZPL
+  })
+})
+.then(r => console.log('✅ Print sent!'))
+.catch(e => console.error('❌ Error:', e));
 ```
 
 ---
 
-## 📊 Production Statistics
+## 🔍 Debug Mode
 
-Track production by checking serial counters:
-```sql
--- SQL query to get production counts
-SELECT 
-    name,
-    last_rfid_serial as total_labels_printed
-FROM product_product
-WHERE use_sequential_rfid = true
-ORDER BY last_rfid_serial DESC;
+### Enable Console Logging
+
+Open browser console (F12) to see detailed logs:
+```
+[Zebra Browser Print] Module loading...
+[Zebra Browser Print] Service starting...
+[Zebra] Download intercepted: {...}
+[Zebra] Is product label? true
+[Zebra] Browser Print available, printers: {...}
+[Zebra] Using printer: ZT231R-203dpi (192.168.3.142)
+[Zebra] Valid ZPL format confirmed!
+[Zebra] RFID encoding detected in ZPL
+[Zebra] Print command sent successfully!
+[Zebra] ✓ Print completed successfully!
 ```
 
 ---
 
-## 🤝 Contributing
+## 🌐 Browser Compatibility
 
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+| Browser | Status | Notes |
+|---------|--------|-------|
+| Chrome | ✅ Supported | Recommended |
+| Edge | ✅ Supported | Recommended |
+| Firefox | ⚠️ Limited | May require `localhost` exception |
+| Safari | ❌ Not Supported | Zebra Browser Print limitation |
 
 ---
 
-## 📜 License
+## 📡 Network Configuration
+
+### Firewall Rules
+
+**Windows Firewall:**
+- Allow: `ZebraBrowserPrint.exe`
+- Port: 9100 (TCP)
+
+**Corporate Firewall:**
+- Allow: `localhost:9100` (loopback)
+- No internet access required
+
+### Multiple Users
+
+Each user needs:
+- Zebra Browser Print installed on their computer
+- Printer connected to their computer (USB/Network)
+- Works independently - no server configuration needed
+
+---
+
+## 🔐 Security
+
+### Data Flow
+- All printing happens locally (client → printer)
+- No data sent to external servers
+- Zebra Browser Print runs on localhost only
+- ZPL data never leaves user's computer
+
+### Privacy
+- No telemetry or tracking
+- No external API calls
+- Works offline
+- GDPR compliant
+
+---
+
+## 🛠️ Technical Details
+
+### API Endpoints
+
+**Zebra Browser Print provides:**
+```
+GET  http://localhost:9100/available
+Response: List of available printers
+
+POST http://localhost:9100/write
+Body: { device: {...}, data: "ZPL..." }
+Response: Print status
+```
+
+### JavaScript Integration
+
+**Module type:** ES6 module (`@odoo-module`)
+
+**Core functionality:**
+- Intercepts `download` service
+- Detects ZPL reports via pattern matching
+- Communicates with Browser Print via fetch API
+- Handles errors with graceful fallback
+
+### Files
+```
+zebra_browser_print/
+├── __init__.py                    # Module initialization
+├── __manifest__.py                # Module metadata
+├── README.md                      # This file
+└── static/
+    └── src/
+        └── js/
+            └── zebra_print.js     # JavaScript interceptor
+```
+
+---
+
+## 🤝 Integration
+
+### Works With
+
+- **RFID EPC Auto Generation** - Print RFID-encoded labels
+- **Stock Barcodes** - Print product/location labels
+- **Custom ZPL Reports** - Any Odoo report generating ZPL
+
+### Creating Compatible Reports
+
+**Your report must:**
+1. Output ZPL format (text/plain)
+2. Include `^XA` (start) and `^XZ` (end) markers
+3. Be named with `label` or `product` in the name
+
+**Example report XML:**
+```xml
+<record id="my_zpl_report" model="ir.actions.report">
+    <field name="name">My ZPL Labels</field>
+    <field name="model">product.product</field>
+    <field name="report_type">qweb-text</field>
+    <field name="report_name">my_module.zpl_template</field>
+</record>
+```
+
+---
+
+## 📄 License
 
 LGPL-3.0 License
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 ---
 
@@ -335,66 +439,43 @@ London, United Kingdom
 
 - **Developer:** Andrew
 - **Email:** info@auroratechgroup.co.uk
-- **Website:** [auroratechgroup.co.uk](https://auroratechgroup.co.uk)
+- **Website:** https://auroratechgroup.co.uk
 
 ---
 
 ## 🙏 Credits
 
-- **Odoo SA** - Base framework
-- **pyepc library** - EPC encoding
 - **Zebra Technologies** - Browser Print API
-- **Ventor Tech** - RFID mobile app inspiration
+- **Odoo SA** - Framework
+- **Community** - Testing and feedback
 
 ---
 
-## 📞 Support
-
-- **Issues:** [GitHub Issues](https://github.com/yourusername/odoo-rfid-modules/issues)
-- **Email:** info@auroratechgroup.co.uk
-- **Odoo Forum:** Search "Aurora Tech RFID"
+**Email:** info@auroratechgroup.co.uk  
 
 ---
 
 ## 🗺️ Roadmap
 
-### Future Features
-
-- [ ] EPC tracking database
-- [ ] Multiple EPC schemes (SSCC, GRAI, GIAI)
-- [ ] Batch EPC generation API
-- [ ] GS1 compliance module
 - [ ] Printer selection UI
-- [ ] Bosnia and Herzegovina localization
-- [ ] Multi-language support (BS/HR/SR)
-- [ ] Odoo 17.0 and 19.0 backports
+- [ ] Print queue management
+- [ ] Print history/logging
+- [ ] Custom printer profiles
+- [ ] Batch printing optimization
+- [ ] Odoo 17.x/19.x support
 
 ---
 
-## 📸 Screenshots
+## ⭐ Like This Module?
 
-### RFID Label Printing
+If this module helped you, please:
+- ⭐ Star the repository
+- 📢 Share with others
+- 🐛 Report issues
+- 💡 Suggest features
 
-![Print Labels](docs/screenshots/print-labels.png)
-
-*Direct printing with automatic RFID encoding*
-
-### Product Configuration
-
-![Product Settings](docs/screenshots/product-settings.png)
-
-*Sequential serial number configuration*
-
-### Browser Print Integration
-
-![Browser Print](docs/screenshots/browser-print.png)
-
-*Automatic printer detection and ZPL transmission*
+```
 
 ---
 
-## ⭐ Star Us!
-
-If this project helped you, please star the repository!
-
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/odoo-rfid-modules?style=social)](https://github.com/yourusername/odoo-rfid-modules)
+**Made with ❤️ by Aurora Tech Group**
