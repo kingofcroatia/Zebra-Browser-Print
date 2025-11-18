@@ -45,7 +45,7 @@ This module intercepts Odoo ZPL report downloads and sends them directly to loca
 ### Step 1: Install Zebra Browser Print (Client Computer)
 
 **Download:**
-https://www.zebra.com/us/en/support-downloads/software/printer-software/zebra-browser-print.html
+[https://www.zebra.com/us/en/support-downloads/software/printer-software/zebra-browser-print.html](https://www.zebra.com/us/en/support-downloads/software/printer-software/browser-print.html)
 
 **Install:**
 1. Download for your OS (Windows/Mac/Linux)
